@@ -13,10 +13,12 @@ ret=$(docker images -q $BASEIMAGE_NAME:$UBUNTU_VERSION 2> /dev/null)
 if [[ "$ret" == "" ]]; then
     echo "Base image for ubuntu$UBUNTU_VERSION does not exist."
     echo "Build $BASEIMAGE_NAME:$UBUNTU_VERSION ..."
-    pushd ./baseimage/ubuntu-$UBUNTU_VERSION
-    docker build -t $BASEIMAGE_NAME:$UBUNTU_VERSION
-    popd
+    docker build -f ./baseimage/ubuntu-$UBUNTU_VERSION/Dockerfile \
+        --build-arg ARG_VERSION=$UBUNTU_VERSION \
+        -t $BASEIMAGE_NAME:$UBUNTU_VERSION .
 fi
 
 echo "Build $SDK_IMAGE:$SDK_TAG ..."
-docker build -t $SDK_IMAGE:$SDK_TAG .
+docker build -f ./Dockerfile \
+    --build-arg ARG_VERSION=$UBUNTU_VERSION \
+    -t $SDK_IMAGE:$SDK_TAG .
